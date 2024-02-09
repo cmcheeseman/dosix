@@ -9,6 +9,8 @@ cmp ah, 0x01
 je printffunc
 cmp ah, 0x02
 je printfsfunc
+cmp ah, 0x03
+je strcmpfunc
 
 ; backup diskid and start userspace
 init:
@@ -128,6 +130,25 @@ printfsloop:
   inc bx
   jmp printfsloop
 printfsend:
+  ret
+
+; compares 2 strings, uses dx
+strcmpfunc:
+  cmp ch, 0
+  je strcmpsame
+  mov dh, [bx]
+  mov dl, [si]
+  cmp dh, dl
+  jne strcmpnotsame
+  inc bx
+  inc si
+  dec ch
+  jmp strcmpfunc
+strcmpsame:
+  mov ah, 0
+  ret
+strcmpnotsame:
+  mov ah, 1
   ret
 
 diskbuff: db 0
