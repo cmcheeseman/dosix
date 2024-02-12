@@ -31,6 +31,10 @@ cool2:
   mov ah, printf
   mov bx, str1
   call kloc
+  mov ah, printfs
+  mov bx, str1
+  mov ch, 4
+  call kloc
 
 jmp $
 times 512-($-$$) db 0
