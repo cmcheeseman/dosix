@@ -1,7 +1,6 @@
 %include "defs.asm"
 [org 0x7c00]
 
-jmp start
 
 start:
 xor bx, bx
@@ -9,10 +8,11 @@ mov es, bx
 
 
 mov ah, 2
-mov al, 7
+mov al, 6
 mov ch, 0
 mov cl, 2
 mov dh, 0
+mov dl, 0x80
 mov bx, kloc
 int 0x13
 

@@ -14,9 +14,33 @@ je strcmpfunc
 
 ; backup diskid and start userspace
 init:
-  mov bx, diskbuff
-  mov BYTE [bx], dl
+  call loadinit
   jmp userloc
+
+loadinit:
+  mov si, initstr
+  mov bx, fdt
+loadinitloop:
+  mov [bxbuff], bx
+  add bx, 4
+  mov ch, 4
+  call strcmpfunc
+  mov bx, [bxbuff]
+  cmp ah, 0
+  je loadinitend
+  mov si, initstr
+  add bx, 9
+  jmp loadinitloop
+loadinitend:
+  mov ah, 2
+  mov al, [bx + 3]
+  mov ch, 0
+  mov cl, [bx + 8]
+  mov dh, 0
+  mov dl, 0x80
+  mov bx, userloc
+  int 0x13
+  ret
 
 ; print string
 printffunc:
@@ -151,7 +175,11 @@ strcmpnotsame:
   mov ah, 1
   ret
 
+bxbuff: dw 0
+sibuff: dw 0
 diskbuff: db 0
+fmt: db "%d", 10, 0
+initstr: db "init"
 times 1024-($-$$) db 0
   
 
