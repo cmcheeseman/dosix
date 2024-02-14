@@ -12,7 +12,7 @@ je printfsfunc
 cmp ah, 0x03
 je strcmpfunc
 
-; backup diskid and start userspace
+; load init program and run it
 init:
   call loadinit
   jmp userloc
