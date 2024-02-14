@@ -177,7 +177,6 @@ strcmpnotsame:
 
 bxbuff: dw 0
 sibuff: dw 0
-diskbuff: db 0
 fmt: db "%d", 10, 0
 initstr: db "init"
 times 1024-($-$$) db 0
