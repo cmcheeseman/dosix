@@ -11,6 +11,8 @@ cmp ah, 0x02
 je printfsfunc
 cmp ah, 0x03
 je strcmpfunc
+cmp ah, 0x04
+je readstrfunc
 
 ; load init program and run it
 init:
@@ -175,10 +177,44 @@ strcmpnotsame:
   mov ah, 1
   ret
 
+readstrfunc:
+  mov ah, 0
+  add cx, bx
+  sub cx, 1
+  mov dx, bx
+readstrloop:
+  mov ah, 0
+  int 16h
+  cmp al, 8
+  je readstrbs
+  cmp al, 13
+  je readstrend
+  mov ah, 0x0e
+  int 10h
+  mov [bx], al
+  cmp bx, cx
+  je readstrend
+  inc bx
+  jmp readstrloop
+readstrbs:
+  cmp bx, dx
+  je readstrloop
+  mov ah, 0x0e
+  int 10h
+  mov al, ' '
+  int 10h
+  mov al, 8
+  int 10h
+  dec bx
+  mov BYTE [bx], 0
+  jmp readstrloop
+
+readstrend:
+  ret
+
 bxbuff: dw 0
 sibuff: dw 0
 fmt: db "%d", 10, 0
 initstr: db "init"
 times 1024-($-$$) db 0
-  
 

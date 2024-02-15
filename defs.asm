@@ -5,6 +5,7 @@
 kloc: equ 0x7e00
 userloc: equ 0x8a00
 fdt: equ 0x8200
+fileloc: equ 0x9a00
 
 ; kernel functions
 
@@ -16,3 +17,6 @@ printfs: equ 0x02
 
 ; compare strings in bx and si, size is stored in ch, returns 0 in al if strings are the same
 strcmp: equ 0x03
+
+; read string from keyboard
+readstr: equ 0x04
