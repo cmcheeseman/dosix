@@ -13,5 +13,8 @@ fs: fs.asm
 prog: prog.asm
 	nasm -fbin prog.asm
 
+test: all
+	qemu-system-x86_64 -drive format=raw,file=os.bin
+
 clean:
 	rm boot kern fs prog os.bin
