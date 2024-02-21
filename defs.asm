@@ -20,3 +20,8 @@ strcmp: equ 0x03
 
 ; read string from keyboard
 readstr: equ 0x04
+
+; load program from disk
+loadprog: equ 0x05
+
+clearscreen: equ 0x06

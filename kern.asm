@@ -13,6 +13,10 @@ cmp ah, 0x03
 je strcmpfunc
 cmp ah, 0x04
 je readstrfunc
+cmp ah, 0x05
+je loadprogfunc
+cmp ah, 0x06
+je clearscreenfunc
 
 ; load init program and run it
 init:
@@ -43,6 +47,31 @@ loadinitend:
   mov bx, userloc
   int 0x13
   ret
+
+loadprogfunc:
+  mov bx, fdt
+loadprogloop:
+  mov [sibuff], si
+  mov [bxbuff], bx
+  add bx, 4
+  mov ch, 4
+  call strcmpfunc
+  mov bx, [bxbuff]
+  cmp ah, 0
+  je loadprogend
+  mov si, [sibuff]
+  add bx, 9
+  jmp loadprogloop
+loadprogend:
+  mov ah, 2
+  mov al, [bx + 3]
+  mov ch, 0
+  mov cl, [bx + 8]
+  mov dh, 0
+  mov dl, 0x80
+  mov bx, userloc
+  int 0x13
+  jmp userloc
 
 ; print string
 printffunc:
@@ -210,6 +239,27 @@ readstrbs:
   jmp readstrloop
 
 readstrend:
+  ret
+
+clearscreenfunc:
+  mov ah, 0x0e
+  mov bl, 200
+clearscreenloop:
+  cmp bl, 0
+  je clearscreenend
+  mov ah, 0x0e
+  mov al, 0xA
+  int 10h
+  mov al, 0xD
+  int 10h
+  dec bl
+  jmp clearscreenloop
+clearscreenend:
+  mov ah, 0x02
+  mov bh, 0
+  mov dh, 0
+  mov dl, 0
+  int 10h
   ret
 
 bxbuff: dw 0
