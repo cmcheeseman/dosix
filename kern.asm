@@ -17,6 +17,8 @@ cmp ah, 0x05
 je loadprogfunc
 cmp ah, 0x06
 je clearscreenfunc
+cmp ah, 0x07
+je zerobufferfunc
 
 ; load init program and run it
 init:
@@ -195,6 +197,8 @@ strcmpfunc:
   mov dl, [si]
   cmp dh, dl
   jne strcmpnotsame
+  cmp dh, 0
+  je strcmpsame
   inc bx
   inc si
   dec ch
@@ -260,6 +264,18 @@ clearscreenend:
   mov dh, 0
   mov dl, 0
   int 10h
+  ret
+
+zerobufferfunc:
+  mov dx, bx
+  add dx, cx
+zerobufferloop:
+  cmp bx, dx
+  je zerobufferend
+  mov BYTE [bx], 0
+  inc bx
+  jmp zerobufferloop
+zerobufferend:
   ret
 
 bxbuff: dw 0
