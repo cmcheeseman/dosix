@@ -19,6 +19,9 @@ cmp ah, 0x06
 je clearscreenfunc
 cmp ah, 0x07
 je zerobufferfunc
+cmp ah, 0x08
+je listthingsfunc
+
 
 ; load init program and run it
 init:
@@ -199,6 +202,8 @@ strcmpfunc:
   jne strcmpnotsame
   cmp dh, 0
   je strcmpsame
+  cmp dl, 0
+  je strcmpsame
   inc bx
   inc si
   dec ch
@@ -276,6 +281,40 @@ zerobufferloop:
   inc bx
   jmp zerobufferloop
 zerobufferend:
+  ret
+
+listthingsfunc:
+  mov ah, 0x0e
+  mov al, 0xA
+  int 10h
+  mov al, 0xD
+  int 10h
+  mov bx, fdt
+  mov [bxbuff], bx
+listthingsloop:
+  mov bx, [bxbuff]
+  mov ah, [bx + 1]
+  cmp ah, 0
+  je listthingsend
+  mov ah, [bx]
+  cmp ah, 0
+  je listthingsdeleted
+  cmp ah, 3
+  je listthingsdeleted
+  add bx, 4
+  mov ch, 4
+  call printfsfunc
+  mov ah, 0x0e
+  mov al, 0xA
+  int 10h
+  mov al, 0xD
+  int 10h
+listthingsdeleted:
+  mov bx, [bxbuff]
+  add bx, 9
+  mov [bxbuff], bx
+  jmp listthingsloop
+listthingsend:
   ret
 
 bxbuff: dw 0

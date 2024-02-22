@@ -27,3 +27,5 @@ loadprog: equ 0x05
 clearscreen: equ 0x06
 
 zerobuffer: equ 0x07
+
+listfs: equ 0x08
