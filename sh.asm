@@ -14,7 +14,7 @@ loop:
 
   mov ah, readstr
   mov bx, buff
-  mov ch, 75
+  mov cx, 75
   call kloc
 
   mov ah, strcmp
@@ -65,7 +65,7 @@ clearbuff:
   call kloc
   jmp loop
 
-welcome: db "login succesful!", 10, 0
+welcome: db "login succesful!", 10, 10, 0
 prompt: db "$ ", 0
 clearstr: db "clear", 0
 lsstr: db "ls", 0
