@@ -25,33 +25,9 @@ je listthingsfunc
 
 ; load init program and run it
 init:
-  call loadinit
-  jmp userloc
+  mov si, initstr
+  jmp loadprogfunc
 
-loadinit:
-  mov si, initstr
-  mov bx, fdt
-loadinitloop:
-  mov [bxbuff], bx
-  add bx, 4
-  mov ch, 4
-  call strcmpfunc
-  mov bx, [bxbuff]
-  cmp ah, 0
-  je loadinitend
-  mov si, initstr
-  add bx, 9
-  jmp loadinitloop
-loadinitend:
-  mov ah, 2
-  mov al, [bx + 3]
-  mov ch, 0
-  mov cl, [bx + 8]
-  mov dh, 0
-  mov dl, 0x80
-  mov bx, userloc
-  int 0x13
-  ret
 
 loadprogfunc:
   mov bx, fdt

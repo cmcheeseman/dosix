@@ -8,7 +8,7 @@ call kloc
 
 jmp start
 str1: db "welcome to DOSIX", 10, 0
-str2: db 10, "pleas login > ", 0
+str2: db 10, "please login > ", 0
 buff: times 5 db 0
 pass: db "hello"
 gudjob: db 10, "you did it! :)", 0
