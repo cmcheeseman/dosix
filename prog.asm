@@ -11,7 +11,7 @@ str1: db "welcome to DOSIX", 10, 0
 str2: db 10, "please login > ", 0
 buff: times 5 db 0
 pass: db "hello"
-gudjob: db 10, "you did it! :)", 0
+loginstr: db "login successful", 10, 10, 0
 sh: db "sh", 0, 0
 start:
 
@@ -40,8 +40,16 @@ cmp ah, 0
 je end
 jmp loop
 end:
+
+mov ah, clearscreen
+call kloc
+mov ah, printf
+mov bx, loginstr
+call kloc
+
 mov ah, loadprog
 mov si, sh
 jmp kloc
+
 jmp $
 times 512-($-$$) db 0

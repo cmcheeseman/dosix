@@ -1,12 +1,10 @@
 %include "defs.asm"
 [org 0x8a00]
 
-mov ah, clearscreen
+mov ah, setmainprog
+mov bx, shstr
 call kloc
 
-mov ah, printf
-mov bx, welcome
-call kloc
 loop:
   mov ah, printf
   mov bx, prompt
@@ -35,6 +33,16 @@ loop:
   cmp ah, 0
   je ls
 
+  mov bx, buff
+  mov ah, BYTE [bx]
+  cmp ah, 0
+  je end
+
+  mov ah, loadprog
+  mov si, buff
+  jmp kloc
+
+end:
   mov ah, zerobuffer
   mov bx, buff
   mov ch, 75
@@ -65,9 +73,10 @@ clearbuff:
   call kloc
   jmp loop
 
-welcome: db "login succesful!", 10, 10, 0
+
 prompt: db "$ ", 0
 clearstr: db "clear", 0
 lsstr: db "ls", 0
+shstr: db "sh", 0, 0
 buff: times 75 db 0
 times 512-($-$$) db 0

@@ -21,7 +21,10 @@ cmp ah, 0x07
 je zerobufferfunc
 cmp ah, 0x08
 je listthingsfunc
-
+cmp ah, 0x09
+je setmainprogfunc
+cmp ah, 0x0A
+je retmainfunc
 
 ; load init program and run it
 init:
@@ -293,9 +296,29 @@ listthingsdeleted:
 listthingsend:
   ret
 
+setmainprogfunc:
+  mov si, mainprog
+  mov cl, 4
+setmainprogloop:
+  cmp cl, 0
+  je setmainprogend
+  mov ch, [bx]
+  mov [si], ch
+  inc bx
+  inc si
+  dec cl
+  jmp setmainprogloop
+setmainprogend:
+  ret
+
+retmainfunc:
+  mov si, mainprog
+  jmp loadprogfunc
+
 bxbuff: dw 0
 sibuff: dw 0
 fmt: db "%d", 10, 0
 initstr: db "init"
+mainprog: db "    "
 times 1024-($-$$) db 0
 
