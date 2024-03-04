@@ -11,7 +11,7 @@ str1: db "welcome to DOSIX", 10, 0
 str2: db 10, "please login > ", 0
 buff: times 5 db 0
 pass: db "hello"
-loginstr: db "login successful", 10, 10, 0
+loginstr: db "login successful", 10, 0
 sh: db "sh", 0, 0
 start:
 

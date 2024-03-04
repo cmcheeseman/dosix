@@ -5,7 +5,18 @@ mov ah, setmainprog
 mov bx, shstr
 call kloc
 
+mov ah, zerobuffer
+mov bx, buff
+mov ch, 75
+call kloc
+
 loop:
+  mov ah, 0x0e
+  mov al, 0xA
+  int 10h
+  mov al, 0xD
+  int 10h
+
   mov ah, printf
   mov bx, prompt
   call kloc

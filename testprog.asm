@@ -8,5 +8,5 @@ call kloc
 mov ah, retmain
 jmp kloc
 
-teststr: db 10, "hello dork! :)", 10, 0
+teststr: db 10, "hello dork! :)", 0
 times 512-($-$$) db 0
