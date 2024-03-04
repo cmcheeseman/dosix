@@ -1,4 +1,4 @@
-all: boot kern prog fs sh testprog
+all: boot kern prog fs sh testprog dfsm
 	cat boot kern fs prog sh testprog > os.bin
 
 boot: boot.asm
@@ -19,8 +19,11 @@ sh: sh.asm
 testprog: testprog.asm
 	nasm -fbin testprog.asm
 
+dfsm: file-manager/dfsm.c
+	gcc file-manager/dfsm.c -o dfsm
+
 test: all
 	qemu-system-x86_64 -drive format=raw,file=os.bin
 
 clean:
-	rm boot kern fs prog sh os.bin
+	rm boot kern fs prog sh os.bin dfsm
