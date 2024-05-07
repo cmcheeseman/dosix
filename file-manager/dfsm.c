@@ -7,10 +7,8 @@ int verifybootable(char *filename) {
   FILE *image = fopen(filename, "rb");
   uint8_t *bytes = malloc(512);
   if ((bytes == NULL) || (image == NULL)){
-    printf("error: couldn't read file");
-    fclose(image);
-    free(bytes);
-    return -1;
+    printf("error: couldn't read file\n");
+    exit(1);
   }
   fread(bytes, 512, 1, image);
   if ((bytes[511] == 0xAA) && (bytes[510] == 0x55)) {
@@ -29,8 +27,7 @@ int ls(char *filename) {
   uint8_t *bytes = malloc(7 * 512);
   if ((image == NULL) || (bytes == NULL)) {
     printf("failed to read file\n");
-    free(bytes);
-    fclose(image);
+    exit(1);
   }
   fread(bytes, 3584, 1, image);
   int i = 0x600;

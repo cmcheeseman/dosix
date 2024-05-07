@@ -1,0 +1,145 @@
+#!/usr/bin/python3
+
+from sys import argv
+from random import randrange
+
+
+if len(argv) < 2:
+  print(argv[0] + " [filename]")
+
+insts = [ "[org 0x8a00]\n"]
+
+mem = []
+
+vars = []
+
+iflabels = []
+
+def getvar(name):
+  for i in range(len(vars)):
+    if vars[i][0] == name:
+      return vars[i][1]
+  return "n"
+
+with open(argv[1], "rt") as inf:
+  for line in inf:
+    if line[:4] == "stop":
+      insts.append("jmp $\n")
+    elif line[:6] == "return":
+      insts.append("mov ah, 0x0A\ncall 0x7e00\n")
+    elif line[:3] == "int":
+
+      txt = line.split()
+      label = "label" + str(randrange(0, 15000))
+      vars.append([txt[1], label])
+      mem.append(label + ": dw 0\n")
+      insts.append("mov bx, " + label + "\n" + "mov WORD [bx], " + txt[3] + "\n")
+
+    elif line[:8] == "printint":
+
+      txt = line.split()
+      insts.append("mov ah, 1\nmov bx, intfmt\n" + "mov ch, BYTE [" + getvar(txt[1]) + "]\ncall 0x7e00\n")
+
+    elif line[:7] == "printnl":
+      insts.append("mov ah, 0x0e\nmov al, 0xA\nint 10h\nmov al, 0xD\nint 10h\n")
+
+    elif line[:5] == "print":
+
+      label = "label" + str(randrange(0, 15000))
+      mem.append(label + ": " + "db " + "10, " + "\"" + line[6:].strip() + "\"" + ", 0\n")
+      insts.append("mov ah, 1\nmov bx, " + label + "\n" + "call 0x7e00\n")
+
+    elif line[:3] == "ifs":
+
+      iflabels.append("iflabel" + str(randrange(0, 15000)))
+      txt = line.split()
+      insts.append("mov ah, 3\nmov bx, " + str(getvar(txt[1])) + "\nmov si, " + str(getvar(txt[3])) + "\nmov ch, " + txt[4] + "\ncall 0x7e00\ncmp ah, 0\n")
+      if txt[2] == "==":
+        insts.append("jne " + iflabels[-1] + "\n")
+      elif txt[2] == "!=":
+        insts.append("je " + iflabels[-1] + "\n")
+
+    elif line[:2] == "if":
+
+      iflabels.append("iflabel" + str(randrange(0, 15000)))
+      txt = line.split()
+      if getvar(txt[1]) == "n":
+        var1 = txt[1]
+      else:
+        var1 = "[" + getvar(txt[1]) + "]"
+      if getvar(txt[3]) == "n":
+        var2 = txt[3]
+      else:
+        var2 = "[" + getvar(txt[3]) + "]"
+      insts.append("mov ax, " + var1 + "\nmov bx, " + var2 + "\ncmp ax, bx\n")
+      if txt[2] == "==":
+        insts.append("jne " + iflabels[-1] + "\n")
+      elif txt[2] == "!=":
+        insts.append("je " + iflabels[-1] + "\n")
+
+    elif line[:4] == "else":
+      iflabels.append("iflabel" + str(randrange(0, 15000)))
+      insts.append("jmp " + iflabels[-1])
+      insts.append(iflabels[-2] + ":\n")
+
+    elif line[:5] == "endif":
+      insts.append(iflabels[-1] + ":\n")
+      del iflabels[-1]
+
+    elif line[:2] == "++":
+      insts.append("mov ax, [" + getvar(line.replace('+', '').strip()) + "]\ninc ax\nmov [" + getvar(line.replace('+', '').strip()) + "], ax\n")
+
+    elif line[:2] == "--":
+      insts.append("mov ax, [" + getvar(line.replace('-', '').strip()) + "]\ndec ax\nmov [" + getvar(line.replace('-', '').strip()) + "], ax\n")
+
+    elif line[:3] == "add":
+      txt = line.split()
+      varname = getvar(txt[2])
+      if varname == "n":
+        insts.append("mov bx, " + txt[2] + "\n")
+      else:
+        insts.append("mov bx, [" + varname + "]\n")
+      insts.append("mov ax, [" + getvar(txt[1]) + "]\nadd ax, bx\nmov [" + getvar(txt[1]) + "], ax\n")
+
+    elif line[:3] == "sub":
+      txt = line.split()
+      varname = getvar(txt[2])
+      if varname == "n":
+        insts.append("mov bx, " + txt[2] + "\n")
+      else:
+        insts.append("mov bx, [" + varname + "]\n")
+      insts.append("mov ax, [" + getvar(txt[1]) + "]\nsub ax, bx\nmov [" + getvar(txt[1]) + "], ax\n")
+
+    elif line[0] == ":":
+      insts.append(line.strip(':').strip() + ":\n")
+
+    elif line[:4] == "goto":
+      insts.append("jmp " + line.split()[1] + "\n")
+
+    elif line[:3] == "str":
+      txt = line.split()
+      label = "label" + str(randrange(0, 15000))
+      vars.append([txt[1], label])
+      mem.append(label + ": times " + txt[2] + " db 0\n")
+
+    elif line[:9] == "createstr":
+      txt = line.split()
+      label = "label" + str(randrange(0, 15000))
+      vars.append([txt[1], label])
+      mem.append(label + ": db \"" + txt[2] + "\", 0\n")
+
+    elif line[:7] == "readstr":
+      txt = line.split()
+      insts.append("mov ah, 4\nmov bx, " + getvar(txt[1]) + "\nmov cx, " + txt[2] + "\ncall 0x7e00\n")
+
+    elif line[:5] == "clear":
+      insts.append("mov ah, 6\ncall 0x7e00\n")
+
+mem.append("intfmt: db \" %d\", 0\n")
+mem.append("times 1024-($-$$) db 0\n")
+
+for i in range(len(insts)):
+  print(insts[i])
+
+for i in range(len(mem)):
+  print(mem[i])

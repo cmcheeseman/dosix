@@ -1,0 +1,28 @@
+:loop
+int x = 34
+
+print type stuff:
+
+str coolstring 25
+
+readstr coolstring 25
+
+createstr coolstring2 cheese
+
+ifs coolstring == coolstring2 25
+sub x 4
+else
+sub x 10
+endif
+
+if x == 30
+print hello
+else
+print goodbye.
+printint x
+goto end
+endif
+
+goto loop
+:end
+return
